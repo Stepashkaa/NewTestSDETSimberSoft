@@ -4,6 +4,8 @@ import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.support.FindBy;
 import com.codeborne.selenide.ElementsCollection;
+
+import java.util.Comparator;
 import java.util.Random;
 import java.io.File;
 
@@ -35,6 +37,9 @@ public class MainFormPage {
 
     @FindBy(xpath = "//ul[not(@id) and not(@type)]")
     private SelenideElement countMessage;
+
+    @FindBy(xpath = "//ul[not(@id) and not(@type)]//li")
+    private SelenideElement sizeTools;
 
     @FindBy(xpath = "//textarea[@id='message']")
     private SelenideElement message;
@@ -83,11 +88,16 @@ public class MainFormPage {
     }
 
     public MainFormPage setCountMessage(){
-        int itemCount = countMessage.$$("li").size();
+        ElementsCollection listTools = countMessage.$$("li");
+        int countTools = listTools.size();
+
+        String longTools = listTools.stream().map(SelenideElement::getText).max(Comparator.comparingInt(String::length)).orElse("Не найден");
+
+        String messageText = "Количество инструментов: " + countTools + " Название самого длинного инструмента: " + longTools;
         message
                 .shouldHave(visible)
-                .setValue(String.valueOf(itemCount))
-                .shouldHave(value(String.valueOf(itemCount)));
+                .setValue(messageText)
+                .shouldHave(value(messageText));
         return this;
     }
 
